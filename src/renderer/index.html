@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        >
+
+        <title>Floating Timer</title>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body>
+        <div class="timer-container">
+            <div class="window-controls">
+                <button
+                    id="compactBtn"
+                    class="window-button"
+                    title="Compact mode"
+                >
+                    ↙
+                </button>
+                <button
+                    id="minimizeBtn"
+                    class="window-button"
+                    title="Minimize"
+                >
+                    -
+                </button>
+                <button
+                    id="closeBtn"
+                    class="window-button close-button"
+                    title="Close"
+                >
+                    x
+                </button>
+            </div>
+            <div class="timer-display" id="timer">
+                00:00:00
+            </div>
+            <div class="duration-container">
+                <button
+                    id="timerSettingsBtn"
+                    class="timer-settings-button"
+                    title="Timer settings"
+                >
+                    ⏱
+                </button>
+                <div
+                    id="durationControls"
+                    class="duration-controls"
+                >
+                    <input 
+                        id="durationInput"
+                        type="text"
+                        value="00:10:00"
+                        placeholder="HH:MM:SS"
+                    >
+
+                    <button 
+                        id="addMinuteBtn"
+                        class="add-minute-button"
+                        title="Add 1 minute"
+                    >
+                        +1
+                    </button>
+                </div>    
+            </div>
+            <div class="controls">
+                <button 
+                    id="startBtn"
+                    class="timer-action-button"
+                    title="Start"
+                    aria-label="Start"
+                >
+                    ▶
+                </button>
+                <button 
+                    id="resetBtn"
+                    class="timer-action-button"
+                    title="Reset"
+                    aria-label="Reset"
+                >
+                    ↻
+                </button>
+            </div>
+        </div>
+        <script src="./renderer.js"></script>
+    </body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "name": "floating-timer",
+  "version": "1.0.0",
+  "description": "A floating desktop timer for windows",
+  "main": "dist/main.js",
+  "scripts": {
+    "clean": "if exist dist rmdir /s /q dist",
+    "build": "npm run clean && tsc -p tsconfig.main.json && tsc -p tsconfig.renderer.json && node build.js",
+    "start": "npm run build && electron .",
+    "dist": "npm run build && electron-builder --win nsis"
+  },
+  "keywords": [],
+  "author": "Akhilesh Sharma",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
+    "typescript": "^7.0.2"
+  },
+  "build": {
+    "appId": "com.floatingtimer.app",
+    "productName": "Floating Timer",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "watch-icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
