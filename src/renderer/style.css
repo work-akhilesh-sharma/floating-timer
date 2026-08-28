@@ -158,15 +158,19 @@ body {
     border-color: #777;
 }
 
-.add-minute-button {
+.add-time-to-count-down {
+    display: flex;
+}
+
+.add-time-btn {
     height: 26px;
 
-    padding: 0 7px;
+    padding: 0 4px;
 
     border: none;
-    border-radius: 5px;
+    border-radius: 50%;
 
-    background: #333;
+    background: transparent;
     color: white;
 
     font-size: 11px;
@@ -176,7 +180,7 @@ body {
     -webkit-app-region: no-drag;
 }
 
-.add-minute-button:hover {
+.add-time-btn:hover {
     background: #444;
 }
 
@@ -347,4 +351,24 @@ button:hover {
 
     padding: 2px 4px;
     font-size: 10px;
+}
+
+.compact-mode .add-time-btn {
+    display: none;
+}
+
+.timer-mode {
+    font-size: 14px;
+    line-height: 1;
+    text-align: center;
+    opacity: 0.5;
+    color: white;
+    user-select: none;
+    pointer-events: none;
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+}
+
+.compact-mode .timer-mode {
+    display: none;
 }
