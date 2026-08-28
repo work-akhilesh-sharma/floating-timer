@@ -7,6 +7,7 @@
     "clean": "if exist dist rmdir /s /q dist",
     "build": "npm run clean && tsc -p tsconfig.main.json && tsc -p tsconfig.renderer.json && node build.js",
     "start": "npm run build && electron .",
+    "dev": "npm run build && concurrently \"tsc -p tsconfig.main.json --watch\" \"tsc -p tsconfig.renderer.json --watch\" \"node watch.js\" \"electronmon .\"",
     "dist": "npm run build && electron-builder --win nsis"
   },
   "keywords": [],
@@ -15,8 +16,10 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^26.2.0",
+    "concurrently": "^10.0.5",
     "electron": "^43.4.1",
     "electron-builder": "^26.15.3",
+    "electronmon": "^2.0.4",
     "typescript": "^7.0.2"
   },
   "build": {

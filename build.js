@@ -26,5 +26,3 @@ fs.copyFileSync(
     path.join(__dirname, "watch-icon.png"),
     path.join(__dirname, "dist", "watch-icon.png")
 );
-
-console.log("copied: watch-icon.png");

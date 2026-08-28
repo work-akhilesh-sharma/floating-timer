@@ -17,9 +17,6 @@ const settingsPath = path.join(
     "timer-settings.json"
 );
 
-console.log("Settings file:", settingsPath);
-
-
 interface TimerSettings {
     x?: number;
     y?: number;
@@ -73,15 +70,19 @@ function isPositionVisible(x: number, y: number): boolean {
 function saveWindowPosition(window: BrowserWindow): void {
     try {
         const [x, y] = window.getPosition();
-        const data = {x, y};
+        const currentSettings = loadSettings();
+
+        const data: TimerSettings = {
+            ...currentSettings,
+            x,
+            y
+        };
 
         fs.writeFileSync(
             settingsPath,
             JSON.stringify(data, null, 2),
             "utf-8"
         );
-
-        console.log("Window position saved:", data);
     } catch (error) {
         console.error(
             "Failed to save window position:",
@@ -102,15 +103,6 @@ function createWindow(): void {
             }
             : null; 
 
-    console.log("Saved settings:", savedSettings);
-    console.log("Saved position:", savedPosition);
-    if (savedPosition) {
-        console.log(
-            "Position visible:",
-            isPositionVisible(savedPosition.x, savedPosition.y)
-        );
-    }
-
     let windowPosition: { x: number; y: number } | null = null;
     if (
         savedPosition &&
@@ -128,11 +120,6 @@ function createWindow(): void {
             x: Math.round(x + (width - windowWidth) / 2),
             y: Math.round(y + (height - windowHeight) / 2)
         };
-
-        console.log(
-            "Using primary display position:",
-            windowPosition
-        );
     }
 
     mainWindow = new BrowserWindow({
@@ -144,7 +131,7 @@ function createWindow(): void {
             y: windowPosition.y
         }: {}),
 
-        minWidth: 395,
+        minWidth: 375,
         minHeight: 55,
 
         frame: false,
@@ -214,11 +201,8 @@ function createWindow(): void {
         mainWindow.moveTop();
     });
 
-    mainWindow.webContents.send("tray-toggle-timer");
-    mainWindow.webContents.send("tray-reset-timer");
-
     mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
-    
+
     mainWindow.on("moved", () => {
         if (mainWindow) {
             saveWindowPosition(mainWindow);
@@ -230,8 +214,6 @@ function createWindow(): void {
             saveWindowPosition(mainWindow);
         }
     });
-
-    // mainWindow.webContents.openDevTools();
 }
 
 // Minimize the application window
@@ -249,8 +231,8 @@ ipcMain.on("window-compact", () => {
         return;
     }
 
-    mainWindow.setMinimumSize(395, 55);
-    mainWindow.setSize(395, 55);
+    mainWindow.setMinimumSize(375, 55);
+    mainWindow.setSize(375, 55);
 });
 
 ipcMain.on("window-expand", () => {
@@ -308,7 +290,6 @@ ipcMain.on("save-timer-settings",
                 "utf-8"
             );
 
-            console.log("Timer settings saved:", data);
         } catch (error) {
             console.error(
                 "Failed to save timer settings:",
@@ -333,5 +314,3 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
-
-

@@ -35,17 +35,11 @@
                     x
                 </button>
             </div>
+            <div id="timerMode" class="timer-mode">Stopwatch</div>
             <div class="timer-display" id="timer">
                 00:00:00
             </div>
             <div class="duration-container">
-                <button
-                    id="timerSettingsBtn"
-                    class="timer-settings-button"
-                    title="Timer settings"
-                >
-                    ⏱
-                </button>
                 <div
                     id="durationControls"
                     class="duration-controls"
@@ -53,20 +47,26 @@
                     <input 
                         id="durationInput"
                         type="text"
-                        value="00:10:00"
+                        value="00:01:00"
                         placeholder="HH:MM:SS"
                     >
-
-                    <button 
-                        id="addMinuteBtn"
-                        class="add-minute-button"
-                        title="Add 1 minute"
-                    >
-                        +1
-                    </button>
+                    <div class="add-time-to-count-down" id="addTimeToCountdown">
+                        <button class="add-time-btn" data-type="second" data-value="10">+10s</button>
+                        <button class="add-time-btn" data-type="second" data-value="20">+20s</button>
+                        <button class="add-time-btn" data-type="second" data-value="30">+30s</button>
+                        <button class="add-time-btn" data-type="minute" data-value="1">+1m</button>
+                        <button class="add-time-btn" data-type="hour" data-value="1">+1h</button>
+                    </div>
                 </div>    
             </div>
             <div class="controls">
+                <button
+                    id="timerSettingsBtn"
+                    class="timer-settings-button"
+                    title="Timer settings"
+                >
+                    ⏱
+                </button>
                 <button 
                     id="startBtn"
                     class="timer-action-button"

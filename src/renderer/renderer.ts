@@ -3,13 +3,16 @@ const minimizeBtn = document.getElementById("minimizeBtn") as HTMLButtonElement;
 const closeBtn = document.getElementById("closeBtn") as HTMLButtonElement;
 
 const timerElement = document.getElementById("timer") as HTMLDivElement;
+const timerModeElement = document.getElementById("timerMode") as HTMLDivElement;
+
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement;
 const resetBtn = document.getElementById("resetBtn") as HTMLButtonElement;
 
 const durationInput = document.getElementById("durationInput") as HTMLInputElement;
 const timerSettingsBtn = document.getElementById("timerSettingsBtn") as HTMLButtonElement;
 const durationControls = document.getElementById("durationControls") as HTMLDivElement;
-const addMinuteBtn = document.getElementById("addMinuteBtn") as HTMLButtonElement; 
+
+const addTimeToCountdown = document.getElementById("addTimeToCountdown") as HTMLDivElement;
 
 let isCompact = false;
 let startTime = 0;
@@ -126,6 +129,7 @@ function switchToCountdownMode(): void {
     timerElement.textContent = formatTime(countdownRemaining);
 
     saveTimerSettings();
+    updateTimerModeLabel();
 }
 
 function switchToStopwatchMode(): void {
@@ -139,27 +143,11 @@ function switchToStopwatchMode(): void {
 
     isCountdown = false;
 
-    // countdownFinished = false;
-    // countdownStarted = false;
-
-    // // Stop any running timer
-    // if (timerInterval !== null) {
-    //     clearInterval(timerInterval);
-    //     timerInterval = null;
-    // }
-
-    // isRunning = false;
-
-    // startTime = 0;
-    // elapsedTime = 0;
-
     timerElement.textContent = formatTime(elapsedTime);
     durationControls.classList.remove("visible");
 
-    // startBtn.textContent = "▶";
-    // startBtn.title = "Start";
-    // startBtn.setAttribute("aria-label", "Start");
     saveTimerSettings();
+    updateTimerModeLabel();
 }
 
 async function loadTimerSettings(): Promise<void> {
@@ -185,7 +173,11 @@ async function loadTimerSettings(): Promise<void> {
         hasSavedCountdownstate = true;
 
         // Restore Stopwatch
+        console.log("Settings received:", settings);
         elapsedTime = settings.stopwatchElapsed;
+        console.log("ELAPSED TIME AFTER RESTORE:", elapsedTime);
+        
+        console.log("RESTORED STOPWATCH: ", settings.stopwatchElapsed);
        
         // always open in Stopwatch mode
         isCountdown = false;
@@ -201,6 +193,8 @@ async function loadTimerSettings(): Promise<void> {
             "aria-label",
             "Start"
         );
+
+        updateTimerModeLabel();
         
         settingsLoaded = true;
         
@@ -324,6 +318,7 @@ function startTimer(): void {
     }
     
     isRunning = true;
+    updateTimerModeLabel();
     startSettingsAutoSave();
 
     startBtn.textContent = "⏸";
@@ -356,6 +351,7 @@ function pauseTimer(): void {
     }
 
     isRunning = false;
+    updateTimerModeLabel();
     stopSettingsAutoSave();
 
     startBtn.textContent = "▶";
@@ -373,26 +369,28 @@ function resetTimer(): void {
     }
 
     isRunning = false;
-
+    stopSettingsAutoSave();
+    
     if (isCountdown) {
         // Reset only countdown
         countdownFinished = false;
         countdownStarted = false;
-
+        
         countdownRemaining = countdownDuration;
         countDownEndTime = 0;
-
+        
         durationInput.value = formatTime(countdownDuration);
-        // if (!updateCountdownDuration()) {
-        // }
         timerElement.textContent = formatTime(countdownRemaining);
     } else {
         // Reset only stopwatch
         startTime = 0
         elapsedTime = 0;
-
+        
         timerElement.textContent = "00:00:00";
     }
+
+    // Update label AFTER resetting the timer state
+    updateTimerModeLabel();
 
     startBtn.textContent = "▶";
     startBtn.title = "Start";
@@ -402,27 +400,85 @@ function resetTimer(): void {
 }
 
 function applyDurationInput(): void {
-    const duration = parseDuration(durationInput.value);
+    const value = durationInput.value.trim();
+    const duration = parseDuration(value);
 
     if (duration === null || duration <= 0) {
         durationInput.value = formatTime(countdownRemaining);
         return;
     }
 
-    if (!isCountdown) {
-        return;
-    }
-
     countdownDuration = duration;
     countdownRemaining = duration;
     countdownFinished = false;
+    countdownStarted = true;
 
     if (isRunning) {
         countDownEndTime = Date.now() + countdownRemaining;
     }
 
+    // durationInput.value = formatTime(countdownRemaining);
     timerElement.textContent = formatTime(countdownRemaining);
     saveTimerSettings();
+}
+
+function addTime(type: string, value: number):void {
+    let timeToAdd: number = 0;
+
+    if (!Number.isFinite(value) || value <= 0) {
+        console.log('Invalid time  value');
+        return;
+    }
+
+    switch(type) {
+        case "second":
+            timeToAdd = value * 1000;
+            break;
+        case "minute":
+            timeToAdd = value * 60 * 1000; 
+            break;
+        case "hour": 
+            timeToAdd = value * 60 * 60 * 1000;
+            break;
+        default: 
+            console.log('Not a valid time');
+            return;
+    }
+
+    switchToCountdownMode();
+
+    countdownRemaining += timeToAdd;
+    countdownDuration += timeToAdd;
+    countdownFinished = false;
+    countdownStarted = true;
+    durationInput.value = formatTime(countdownRemaining);
+    timerElement.textContent = formatTime(countdownRemaining);
+    if (isRunning) {
+        countDownEndTime = Date.now() + countdownRemaining;
+    }
+    saveTimerSettings();
+}
+
+function updateTimerModeLabel(): void {
+    if (isCountdown) {
+        if (countdownFinished) {
+            timerModeElement.textContent = "Countdown - Finished";
+        } else if (isRunning) {
+            timerModeElement.textContent = "Countdown - Running";
+        } else if (countdownStarted) {
+            timerModeElement.textContent = "Countdown - paused";
+        } else {
+            timerModeElement.textContent = "Countdown";
+        }
+    } else {
+        if (isRunning) {
+            timerModeElement.textContent = "Stopwatch - Running";
+        } else if (elapsedTime > 0) {
+            timerModeElement.textContent = "Stopwatch - Paused";
+        } else {
+            timerModeElement.textContent = "Stopwatch";
+        }
+    }
 }
 
 startBtn.addEventListener("click", () => {
@@ -481,8 +537,22 @@ compactBtn.addEventListener(
 );
 
 durationInput.addEventListener("input", () => {
+    // switchToCountdownMode();
+});
+
+durationInput.addEventListener("focus", () => {
     switchToCountdownMode();
+});
+
+durationInput.addEventListener("blur", () => {
     applyDurationInput();
+});
+
+durationInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        durationInput.blur();
+    }
 });
 
 timerSettingsBtn.addEventListener("click", () => {
@@ -497,27 +567,25 @@ timerSettingsBtn.addEventListener("click", () => {
     }
 });
 
-addMinuteBtn.addEventListener("click", () => {
-    switchToCountdownMode();
+addTimeToCountdown.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
 
-    const oneMinute = 60 * 1000;
-
-    countdownRemaining += oneMinute;
-    countdownDuration += oneMinute;
-
-    countdownFinished = false;
-
-    durationInput.value = formatTime(countdownRemaining);
-    timerElement.textContent = formatTime(countdownRemaining);
-    if (isRunning) {
-        countDownEndTime = Date.now() + countdownRemaining;
+    if (target.tagName !== "BUTTON") {
+        return;
     }
-    saveTimerSettings();
+
+    const type = target.dataset.type;
+    const value = target.dataset.value;
+
+    if (!type || !value) {
+        return;
+    }
+
+    addTime(type, Number(value));
 });
 
-
 document.addEventListener("keydown", (event) => {
-    // Space → Start / Pause
+    // Space → Start / Pause 
     if (event.code === "Space") {
         event.preventDefault();
         startBtn.click();
@@ -531,14 +599,6 @@ document.addEventListener("keydown", (event) => {
     // C → compact / Expand
     if (event.key.toLowerCase() === "c") {
         compactBtn.click();
-    }
-});
-
-document.addEventListener("mousedown", (event) => {
-    const target = event.target as HTMLElement;
-
-    if (target !== durationInput) {
-        durationInput.blur();
     }
 });
 
@@ -556,4 +616,8 @@ window.addEventListener(
     saveTimerSettings();
 });
 
-loadTimerSettings();
+loadTimerSettings().then(() => {
+    console.log("Timer loaded successfully");
+    console.log("FINAL ELAPSED TIME:", elapsedTime);
+    console.log("FINAL DISPLAY:", timerElement.textContent);
+});
