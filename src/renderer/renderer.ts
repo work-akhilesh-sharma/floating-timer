@@ -376,11 +376,11 @@ function resetTimer(): void {
         countdownFinished = false;
         countdownStarted = false;
         
-        countdownRemaining = countdownDuration;
+        countdownRemaining = 0;
         countDownEndTime = 0;
         
-        durationInput.value = formatTime(countdownDuration);
-        timerElement.textContent = formatTime(countdownRemaining);
+        durationInput.value = "00:00:00";
+        timerElement.textContent = "00:00:00";
     } else {
         // Reset only stopwatch
         startTime = 0
@@ -417,7 +417,6 @@ function applyDurationInput(): void {
         countDownEndTime = Date.now() + countdownRemaining;
     }
 
-    // durationInput.value = formatTime(countdownRemaining);
     timerElement.textContent = formatTime(countdownRemaining);
     saveTimerSettings();
 }
@@ -462,6 +461,7 @@ function addTime(type: string, value: number):void {
 function updateTimerModeLabel(): void {
     if (isCountdown) {
         if (countdownFinished) {
+            durationInput.value = "00:00:00";
             timerModeElement.textContent = "Countdown - Finished";
         } else if (isRunning) {
             timerModeElement.textContent = "Countdown - Running";
@@ -537,7 +537,7 @@ compactBtn.addEventListener(
 );
 
 durationInput.addEventListener("input", () => {
-    // switchToCountdownMode();
+    // do nothing
 });
 
 durationInput.addEventListener("focus", () => {
